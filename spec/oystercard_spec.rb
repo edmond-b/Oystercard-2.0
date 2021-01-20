@@ -23,28 +23,36 @@ describe Oystercard do
   end
 
   describe '.touch_in' do
+    let(:station){ double :station }
+    it 'remembers the entry station' do
+      subject.top_up(10)
+      subject.touch_in(station)
+      expect(subject.entry_station).to eq(station)
+    end
+
     it 'responds to touch_in' do
       expect(subject).to respond_to(:touch_in)
     end
 
     it 'changes the value of in_journey to true' do
       subject.top_up(10)
-      expect { subject.touch_in }.to change {subject.in_journey}.from(false).to(true)
+      expect { subject.touch_in(station) }.to change {subject.in_journey}.from(false).to(true)
     end
 
     it 'raises an error if not enough balance' do
-      expect { subject.touch_in }.to raise_error("Insufficient funds")
+      expect { subject.touch_in(station) }.to raise_error("Insufficient funds")
     end
   end
 
   describe 'touch_out' do
+    let(:station){ double :station }
     it 'responds to touch_out' do
       expect(subject).to respond_to(:touch_out)
     end
 
     it 'changes the value of in_journey to false' do
       subject.top_up(10)
-      subject.touch_in
+      subject.touch_in(station)
       expect { subject.touch_out }.to change {subject.in_journey}.from(true).to(false)
     end
 
