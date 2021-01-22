@@ -37,11 +37,7 @@ class Oystercard
   end
 
   def store_journey(entry, exit)
-    hash = {
-      :entry_station => entry,
-      :exit_station => exit
-    }
-    @journeys << hash
+    @journeys << {:entry_station => entry, :exit_station => exit}
   end
 
   def deduct(amount)
