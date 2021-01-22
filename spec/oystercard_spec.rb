@@ -1,6 +1,22 @@
 require 'oystercard'
 
 describe Oystercard do
+  describe '.journey' do
+    it 'has empty list of journeys by default' do
+      expect(subject.journeys).to be_empty
+    end
+
+    let(:journey){ {entry_station: entry_station, exit_station: exit_station} }
+    let(:entry_station){ double :station }
+    let(:exit_station){ double :station }
+    it 'stores a journey' do
+      subject.top_up(10)
+      subject.touch_in(entry_station)
+      subject.touch_out(exit_station)
+      expect(subject.journeys).to include(journey)
+    end
+  end
+
   describe 'balance' do
     it 'has a default balance of 0' do
       expect(subject.balance).to eq(0)
@@ -31,7 +47,7 @@ describe Oystercard do
     end
 
     it 'responds to touch_in' do
-      expect(subject).to respond_to(:touch_in)
+      expect(subject).to respond_to(:touch_in).with(1).argument
     end
 
     it 'changes the value of in_journey to true' do
@@ -47,17 +63,24 @@ describe Oystercard do
   describe 'touch_out' do
     let(:station){ double :station }
     it 'responds to touch_out' do
-      expect(subject).to respond_to(:touch_out)
+      expect(subject).to respond_to(:touch_out).with(1).argument
+    end
+
+    it 'remembers the exit station' do
+      subject.top_up(10)
+      subject.touch_in(station)
+      subject.touch_out(station)
+      expect(subject.exit_station).to eq(station)
     end
 
     it 'changes the value of in_journey to false' do
       subject.top_up(10)
       subject.touch_in(station)
-      expect { subject.touch_out }.to change {subject.in_journey}.from(true).to(false)
+      expect { subject.touch_out(station) }.to change {subject.in_journey}.from(true).to(false)
     end
 
     it 'charges min balance for journey on touch touch_out' do
-      expect{ subject.touch_out }.to change{ subject.balance }.by(-(Oystercard::MIN_BALANCE))
+      expect{ subject.touch_out(station) }.to change{ subject.balance }.by(-(Oystercard::MIN_BALANCE))
     end
   end
 
